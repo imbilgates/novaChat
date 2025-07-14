@@ -6,14 +6,17 @@ import {
   Text,
   TextInput,
   View,
+  Alert,
+  Keyboard,
+  TouchableOpacity,
 } from "react-native";
-import  { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Keyboard } from "react-native";
 import { auth, db } from "../../config/firebase-config";
 import { getUniqueChatId } from "../../utils/getUniqueChatId";
 import {
   arrayUnion,
+  arrayRemove,
   doc,
   getDoc,
   onSnapshot,
@@ -26,30 +29,22 @@ const ChatScreen = ({ clickedUser }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
-
-  const uniqueId = uuid.v4();
+  const [openMessageIndex, setOpenMessageIndex] = useState(null);
 
   const scrollViewRef = useRef(null);
-
   const user = auth.currentUser;
 
-  // Scroll to the bottom when the component mounts and when messages change
   useEffect(() => {
     const timer = setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
-
     return () => clearTimeout(timer);
   }, [messages]);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }
-    );
-
+    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    });
     return () => {
       keyboardDidShowListener.remove();
     };
@@ -58,11 +53,7 @@ const ChatScreen = ({ clickedUser }) => {
   useEffect(() => {
     if (user && clickedUser) {
       setLoading(true);
-      const chatRef = doc(
-        db,
-        "chats",
-        getUniqueChatId(user?.uid, clickedUser?.uid)
-      );
+      const chatRef = doc(db, "chats", getUniqueChatId(user?.uid, clickedUser?.uid));
       const unsubscribe = onSnapshot(chatRef, (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
@@ -72,17 +63,15 @@ const ChatScreen = ({ clickedUser }) => {
         }
         setLoading(false);
       });
-
       return () => unsubscribe();
     }
   }, [user, clickedUser]);
 
   const sendMessage = async () => {
-    if (!message.trim()) return; // Avoid sending empty messages
-
+    if (!message.trim()) return;
     try {
       const receivedMessage = {
-        id: uniqueId, // More unique ID
+        id: uuid.v4(),
         name: user?.displayName || "Anonymous",
         img: user?.photoURL,
         time: new Date().toLocaleTimeString(),
@@ -96,7 +85,7 @@ const ChatScreen = ({ clickedUser }) => {
 
       if (chatDoc.exists()) {
         await updateDoc(chatRef, {
-          messages: arrayUnion(receivedMessage), // Use arrayUnion to avoid duplicates
+          messages: arrayUnion(receivedMessage),
         });
       } else {
         await setDoc(chatRef, {
@@ -104,28 +93,58 @@ const ChatScreen = ({ clickedUser }) => {
         });
       }
 
-      setMessage(""); // Reset message input only on success
+      setMessage("");
     } catch (error) {
       console.error("Error sending message: ", error);
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View
-      style={[
-        styles.messageContainer,
-        item.sender === user?.uid ? styles.sentMessage : styles.receivedMessage,
-      ]}
-    >
-      <Text style={styles.username}>{item.name}</Text>
-      <Text style={styles.message}>{item.text}</Text>
-      <Text style={styles.time}>
-        {item.time?.seconds
-          ? new Date(item.time.seconds * 1000).toLocaleTimeString()
-          : item.time || ""}
-      </Text>
-    </View>
-  );
+  const deleteChatMessage = async (msg) => {
+    try {
+      const chatId = getUniqueChatId(user?.uid, clickedUser?.uid);
+      const chatRef = doc(db, "chats", chatId);
+      await updateDoc(chatRef, {
+        messages: arrayRemove(msg),
+      });
+    } catch (error) {
+      console.error("Error deleting message: ", error);
+    }
+  };
+
+  const renderItem = ({ item, index }) => {
+    const isSentByUser = item.sender === user?.uid;
+
+    return (
+      <TouchableOpacity
+        onPress={() => isSentByUser && setOpenMessageIndex(prev => (prev === index ? null : index))}
+        activeOpacity={0.8}
+        style={[
+          styles.messageContainer,
+          isSentByUser ? styles.sentMessage : styles.receivedMessage,
+        ]}
+      >
+        <Text style={styles.username}>{item.name}</Text>
+        <Text style={styles.message}>{item.text}</Text>
+
+        <View style={styles.footerRow}>
+          <Text style={styles.time}>
+            {item.time?.seconds
+              ? new Date(item.time.seconds * 1000).toLocaleTimeString()
+              : item.time || ""}
+          </Text>
+
+          {isSentByUser && openMessageIndex === index && (
+            <TouchableOpacity
+              onPress={() => deleteChatMessage(item)}
+              style={styles.deleteIcon}
+            >
+              <Text style={{ fontSize: 16 }}>🗑️</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <KeyboardAvoidingView
@@ -171,8 +190,8 @@ export default ChatScreen;
 const styles = StyleSheet.create({
   scrollView: {
     flexGrow: 1,
-    padding: 16, // adds padding around all messages
-    paddingBottom: 80, // keeps space above input box
+    padding: 16,
+    paddingBottom: 80,
   },
   messageContainer: {
     maxWidth: "75%",
@@ -204,10 +223,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: "#111",
   },
+  footerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   time: {
     fontSize: 12,
     color: "#777",
-    textAlign: "right",
+  },
+  deleteIcon: {
+    marginLeft: 10,
   },
   inputContainer: {
     flexDirection: "row",
@@ -228,10 +254,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     fontSize: 16,
     color: "#000",
-    marginBottom: 20
+    marginBottom: 20,
   },
   sendBtn: {
     marginLeft: 10,
-    marginBottom: 20
+    marginBottom: 20,
   },
 });

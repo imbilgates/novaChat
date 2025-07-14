@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -10,18 +10,18 @@ import {
 } from "react-native";
 import { Avatar, ListItem } from "react-native-elements";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import useUsersLog from "../hooks/useUsersLog";
 import { useFireUser } from "../context/UserContext";
 import { addChatToUserPage } from "../utils/addChatToUserPage";
-import useFetchFriends from "../hooks/useFetchFriends"; // 👈 added
+import useFetchFriends from "../hooks/useFetchFriends";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase-config";
 
 const SearchUsers = () => {
   const { users } = useUsersLog();
   const { fireUser: currentUser } = useFireUser();
-  const { userPageData, loading } = useFetchFriends(); // 👈 use existing friends list
+  const { userPageData, loading } = useFetchFriends();
 
   const [search, setSearch] = useState("");
   const [filteredList, setFilteredList] = useState([]);
@@ -29,6 +29,17 @@ const SearchUsers = () => {
   useEffect(() => {
     setFilteredList([]);
   }, [users]);
+  const inputRef = useRef(null);
+
+  // 🔁 Focus the input every time screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      const timeout = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300); // slight delay ensures focus after transition
+      return () => clearTimeout(timeout);
+    }, [])
+  );
 
   const filterList = (text) => {
     setSearch(text);
@@ -48,7 +59,6 @@ const SearchUsers = () => {
     try {
       if (currentUser.uid === selectedUser.uid) return;
       await addChatToUserPage(currentUser, selectedUser);
-      router.push(`/chat/${selectedUser.uid}`);
     } catch (error) {
       Alert.alert("Error", "Could not start chat.");
       console.error("Failed to add chat:", error);
@@ -104,6 +114,7 @@ const SearchUsers = () => {
         placeholderTextColor="#000"
         value={search}
         onChangeText={filterList}
+        ref={inputRef}
       />
 
       {search.length > 0 && filteredList.length === 0 ? (
@@ -112,7 +123,7 @@ const SearchUsers = () => {
         <FlatList
           style={styles.searchList}
           data={filteredList}
-          keyExtractor={(item) => item.uid.toString()}
+          keyExtractor={(item) => item.uid}
           renderItem={renderItem}
         />
       )}
