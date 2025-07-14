@@ -1,5 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, View } from 'react-native'
 import SearchUsers from '../../components/SearchUsers'
 
 const Search = () => {
@@ -9,7 +8,6 @@ const Search = () => {
     </View>
   )
 }
-
 export default Search
 
 const styles = StyleSheet.create({

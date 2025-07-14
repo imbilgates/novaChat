@@ -1,7 +1,5 @@
-import { View, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, TouchableOpacity, Text } from 'react-native';
-import React, { useState } from 'react';
-import { auth } from '../../config/firebase-config';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { View, StyleSheet, TextInput, Button, KeyboardAvoidingView, TouchableOpacity, Text } from 'react-native';
+import { useState } from 'react';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../../store/authThunks';
@@ -10,15 +8,28 @@ const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
+    const [loading, setLoading] = useState(false);
 
 
     const dispatch = useDispatch();
     const authStatus = useSelector((state) => state.auth.status);
     const authError = useSelector((state) => state.auth.error);
 
-    const handleRegister = () => {
-        dispatch(register({ email, password, username }));
+    const handleRegister = async () => {
+        setLoading(true);
+        try {
+            const result = await dispatch(register({ email, password, username })).unwrap();
+            console.log("REGISTER SUCCESS", result);
+            router.replace("/(tabs)");
+        } catch (err) {
+            console.error('❌ Registration failed:', err);
+            alert(err);
+        } finally {
+            setLoading(false);
+        }
     };
+
+
 
     return (
         <View style={styles.container}>

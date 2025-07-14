@@ -1,75 +1,54 @@
 import { View, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, Text, TouchableOpacity, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { useOAuth } from '@clerk/clerk-expo';
-import * as Linking from 'expo-linking';
-import { useWarmUpBrowser } from '../../hooks/useWarmUpBrowser';
-import * as WebBrowser from 'expo-web-browser';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../store/authThunks';
 
-WebBrowser.maybeCompleteAuthSession();
-
-const Login = () => {
-
-  useWarmUpBrowser();
-
-
+const LoginScreen = () => {
   const router = useRouter();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
-
-  const onPress = React.useCallback(async () => {
-    try {
-      const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow({
-        redirectUrl: Linking.createURL('/dashboard', { scheme: 'myapp' }),
-      })
-
-      if (createdSessionId) {
-        setActive({ session: createdSessionId });
-        router.replace('/(tabs)');
-      } else {
-        console.log("Clerk failed to create a session");
-      }
-    } catch (err) {
-      console.error('OAuth error', err);
-    }
-  }, []);
-
-
   const dispatch = useDispatch();
-
   const authStatus = useSelector((state) => state.auth.status);
   const authError = useSelector((state) => state.auth.error);
 
-  const handleLogin = () => {
-    dispatch(login({ email, password }));
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      await dispatch(login({ email, password })).unwrap();
+      // Optional: navigate or toast
+      router.replace("/(tabs)")
+    } catch (err) {
+      console.error('Login failed:', err);
+      // Show user-friendly error message
+    } finally {
+      setLoading(false);
+    }
   };
 
 
   return (
     <View style={styles.container}>
-      <KeyboardAvoidingView behavior="padding" style={styles.avoidingView} >
+      <KeyboardAvoidingView behavior="padding" style={styles.avoidingView}>
         <TextInput
           style={styles.input}
-          placeholder='Email'
+          placeholder="Email"
           placeholderTextColor="#aaa"
-          autoCapitalize='none'
-          keyboardType='email-address'
+          autoCapitalize="none"
+          keyboardType="email-address"
           onChangeText={setEmail}
           value={email}
         />
 
         <TextInput
           style={styles.input}
-          placeholder='Password'
+          placeholder="Password"
           placeholderTextColor="#aaa"
-          autoCapitalize='none'
+          autoCapitalize="none"
           onChangeText={setPassword}
           value={password}
           secureTextEntry
@@ -92,9 +71,10 @@ const Login = () => {
           </View>
         )}
 
+        {/* Optional Google UI (without Clerk logic) */}
         <View style={styles.googleBtnContainer}>
           <Text>Or Continue with</Text>
-          <TouchableOpacity style={styles.googleBtn} onPress={onPress}>
+          <TouchableOpacity style={styles.googleBtn} onPress={() => alert("Google login not implemented")}>
             <Image
               source={require('../../assets/images/google.png')}
               style={styles.googleIcon}
@@ -108,7 +88,8 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginScreen;
+
 
 const styles = StyleSheet.create({
   container: {

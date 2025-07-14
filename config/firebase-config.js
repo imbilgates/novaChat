@@ -15,7 +15,6 @@ const firebaseConfig = {
 };
 
 
-
 const app = initializeApp(firebaseConfig);
 
 // Use this for React Native apps to ensure persistence across sessions

@@ -1,54 +1,24 @@
-import { Redirect, router } from 'expo-router'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect } from 'react';
-import { useAuth } from '@clerk/clerk-expo';
-import { useNavigation } from '@react-navigation/native';
-import { onAuthStateChanged } from '@firebase/auth';
+import { Redirect } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../config/firebase-config';
 
 const Index = () => {
-  
-
-  const { isSignedIn } = useAuth();
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    if (isSignedIn) {
-      navigation.navigate('(tabs)');
-    } else {
-      console.log("Not signed in");
-    }
-  }, [isSignedIn, navigation]);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigation.navigate('(tabs)');
-      }
+      setIsAuthenticated(!!user);
+      setCheckingAuth(false);
     });
 
-    return () => unsubscribe();
-  }, [navigation, auth]);
+    return unsubscribe;
+  }, []);
 
-  return (
-    <View style={styles.container}>
-      {isSignedIn ?
-        <Redirect href={'/'}
-        />
-        :
-        <Redirect href={'/auth/'}
-        />
-      }
-    </View>
-  )
-}
+  if (checkingAuth) return null; // or loading spinner
 
-export default Index
+  return <Redirect href={isAuthenticated ? '/(tabs)' : '/auth'} />;
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
-})
+export default Index;

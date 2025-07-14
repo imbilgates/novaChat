@@ -1,32 +1,8 @@
 import { StyleSheet } from 'react-native';
-import React, { useEffect } from 'react';
-import { useAuth } from '@clerk/clerk-expo';
-import { useNavigation } from '@react-navigation/native';
 import { Stack } from 'expo-router';
-import { auth } from '../../config/firebase-config';
-import { onAuthStateChanged } from '@firebase/auth';
 
-const Page = () => {
-    const { isSignedIn } = useAuth();
-    const navigation = useNavigation();
 
-    useEffect(() => {
-        if (isSignedIn) {
-            navigation.navigate('(tabs)');
-        } else {
-            console.log("Not signed in");
-        }
-    }, [isSignedIn, navigation]);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-          if (user) {
-            navigation.navigate('(tabs)');
-          }
-        });
-    
-        return () => unsubscribe();
-      }, [navigation, auth]);
+const AuthLayout  = () => {
     
 
     return (
@@ -53,7 +29,7 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default AuthLayout;
 
 const styles = StyleSheet.create({
     headerStyle: {

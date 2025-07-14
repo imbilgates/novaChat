@@ -1,12 +1,11 @@
 import { router, Tabs } from 'expo-router';
-import React from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
 import { View } from 'react-native';
 import { Pressable } from 'react-native';
 import Signout from '../../components/Signout';
 
-export default function TabLayout() {
+const _Layout = () => {
 
   return (
     <Tabs>
@@ -56,6 +55,8 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+export default _Layout;
+
 
 const Search = () => {
     

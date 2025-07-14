@@ -1,28 +1,50 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../config/firebase-config';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../config/firebase-config';
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [fireUser, setFireUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const [fireUser, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [openGrp, setOpenGrp] = useState(false);
+  const [chatWithWho, setChatWithWho] = useState([]);
+  const [openNotify, setOpenNotify] = useState(false);
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setFireUser(user);
-            setLoading(false);  
-        });
 
-        return () => unsubscribe();
-    }, []);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
 
-    return (
-        <UserContext.Provider value={{ fireUser, loading }}>
-            {children}
-        </UserContext.Provider>
-    );
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const obj = {
+    fireUser,
+    setUser,
+    loading,
+    open,
+    setOpen,
+    openGrp,
+    setOpenGrp,
+    chatWithWho,
+    setChatWithWho,
+    setOpenNotify,
+    openNotify,
+  };
+
+  return (
+    <UserContext.Provider value={obj}>
+      {children}
+    </UserContext.Provider>
+  );
 };
+
 
 // Custom hook to use the UserContext
 export const useFireUser = () => useContext(UserContext);

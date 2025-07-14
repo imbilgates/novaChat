@@ -3,11 +3,9 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { auth } from '../config/firebase-config';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { useAuth } from '@clerk/clerk-expo';
 
 const Signout = () => {
     const [loading, setLoading] = useState(false);
-    const { signOut } = useAuth()
 
     const handleSignOut = () => {
         setLoading(true);
@@ -15,9 +13,6 @@ const Signout = () => {
             setTimeout(async () => {
                 // for firebase
                 await auth.signOut();
-
-                // for clerk
-                await signOut();
 
                 router.replace('auth');
                 console.log('User signed out');

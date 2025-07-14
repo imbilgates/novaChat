@@ -1,66 +1,68 @@
-import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { FlatList, Text, StyleSheet } from 'react-native';
-import { Avatar, ListItem } from 'react-native-elements';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { users } from '../utils/users';
-import { auth, db } from '../config/firebase-config';
-import { doc, onSnapshot } from 'firebase/firestore';
-
+import { router } from "expo-router";
+import { FlatList, Text, StyleSheet, View, ActivityIndicator } from "react-native";
+import { Avatar, ListItem } from "react-native-elements";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import useFetchFriends from "../hooks/useFetchFriends";
 
 const UsersChatList = () => {
-
-  const user  = auth.currentUser?.uid;
-
-  const [ currentUserChatList, setCurrentUserChatList ] = useState([]);
-
-  useEffect(() => {
-    if (user) {
-        const chatRef = doc(db, 'userPage', user);
-
-        const unsubscribe = onSnapshot(chatRef, (doc) => {
-            if (doc.exists()) {
-                const data = doc.data();
-                setCurrentUserChatList(Array.isArray(data.chats) ? data.chats : []);
-            } else {
-                console.log('No such document!');
-                setCurrentUserChatList([]);
-            }
-        }, (error) => {
-            console.error('Error fetching user page data:', error);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }
-}, []);
-
+  const { userPageData: chatList, loading, error } = useFetchFriends();
 
   const renderItem = ({ item, index }) => {
-    const isLastItem = index === users.length - 1;
+    const isLastItem = index === chatList.length - 1;
 
     return (
-      <TouchableOpacity onPress={()=> router.push(`/chat/${item.id}`)}>
+      <TouchableOpacity onPress={() => router.push(`/chat/${item.id}`)}>
         <ListItem
           bottomDivider={!isLastItem}
           containerStyle={isLastItem ? { borderBottomWidth: 0 } : null}
         >
           <Avatar rounded source={{ uri: item.img }} />
           <ListItem.Content>
-            <ListItem.Title style={styles.name}>{item.name}</ListItem.Title>
-            <ListItem.Subtitle style={styles.lastMessage}>{item.text}</ListItem.Subtitle>
+            <ListItem.Title style={styles.username}>{item.name}</ListItem.Title>
+            <ListItem.Subtitle style={styles.lastMessage}>
+              {item.text}
+            </ListItem.Subtitle>
           </ListItem.Content>
-          <Text style={styles.time}>{item.time}</Text>
+          <Text style={styles.time}>
+            {item.time?.seconds
+              ? new Date(item.time.seconds * 1000).toLocaleTimeString()
+              : item.time || ""}
+          </Text>
         </ListItem>
       </TouchableOpacity>
     );
   };
 
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={{ color: "red" }}>Error: {error.message}</Text>
+      </View>
+    );
+  }
+
+  if (chatList.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text>No chats available.</Text>
+      </View>
+    );
+  }
+
   return (
     <FlatList
-      data={currentUserChatList.slice().reverse()}
-      keyExtractor={(item) => item.id.toString()}
+      data={chatList.slice().reverse()}
+      keyExtractor={(item) => item.id?.toString()}
       renderItem={renderItem}
+      contentContainerStyle={{ paddingBottom: 20 }}
     />
   );
 };
@@ -70,17 +72,21 @@ export default UsersChatList;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   username: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   lastMessage: {
-    color: 'gray',
+    color: "gray",
   },
   time: {
-    color: 'gray',
+    color: "gray",
     fontSize: 12,
   },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
-
