@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   View,
-  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import { Avatar } from "react-native-elements";
@@ -14,6 +13,7 @@ import { useFireUser } from "../context/UserContext";
 import useFetchFriends from "../hooks/useFetchFriends";
 import { router } from "expo-router";
 import Modal from "react-native-modal";
+import SkeletonLoader from "../utils/SkeletonLoader";
 
 const UsersChatList = () => {
   const { fireUser: currentUser } = useFireUser();
@@ -51,46 +51,58 @@ const UsersChatList = () => {
       onPress={() => router.push(`/chat/${item.id}`)}
       onLongPress={() => openDeleteModal(item)}
     >
-      <Avatar rounded source={{ uri: item.img }} containerStyle={styles.avatar} />
+      {item.img ? (
+        <Avatar
+          rounded
+          source={{ uri: item.img }}
+          size="medium"
+          title={item.name?.charAt(0).toUpperCase() || "U"}
+          renderPlaceholderContent={
+            <Text style={{ color: "#fff", fontWeight: "bold" }}>
+              {item.name?.charAt(0).toUpperCase() || "U"}
+            </Text>
+          }
+          containerStyle={{ backgroundColor: "#000" }}
+        />
+      ) : (
+        <Avatar
+          rounded
+          title={item.name?.charAt(0).toUpperCase() || "U"}
+          size="medium"
+          containerStyle={{ backgroundColor: "#000" }}
+        />
+      )}
+
       <View style={styles.chatContent}>
         <View style={styles.chatHeader}>
           <Text style={styles.username}>{item.name}</Text>
           <Text style={styles.time}>
             {item.time?.seconds
               ? new Date(item.time.seconds * 1000).toLocaleTimeString()
-              : item.time || ""}
+              : ""}
           </Text>
         </View>
         <Text style={styles.lastMessage} numberOfLines={1}>
-          {item.text}
+          {item.text || "Start the conversation..."}
         </Text>
       </View>
     </TouchableOpacity>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#000" />
-      </View>
-    );
-  }
-
-  if (error) {
+  if (loading) return <SkeletonLoader />;
+  if (error)
     return (
       <View style={styles.centered}>
         <Text style={{ color: "red" }}>Error: {error.message}</Text>
       </View>
     );
-  }
 
-  if (chatList.length === 0) {
+  if (chatList.length === 0)
     return (
       <View style={styles.centered}>
         <Text>No chats available.</Text>
       </View>
     );
-  }
 
   return (
     <>
@@ -101,23 +113,22 @@ const UsersChatList = () => {
         contentContainerStyle={{ paddingBottom: 20 }}
       />
 
-      <Modal
-        isVisible={modalVisible}
-        onBackdropPress={closeModal}
-        style={styles.modal}
-      >
+      <Modal isVisible={modalVisible} onBackdropPress={closeModal}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Remove Chat</Text>
           <Text style={styles.modalSubtitle}>
             Do you want to remove{" "}
-            <Text style={{ fontWeight: "bold" }}>{selectedUser?.name}</Text> from your chat list?
+            <Text style={{ fontWeight: "bold" }}>{selectedUser?.name}</Text>?
           </Text>
 
           <View style={styles.modalButtons}>
             <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteButton} onPress={handleRemoveUser}>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleRemoveUser}
+            >
               <Text style={styles.deleteText}>Delete</Text>
             </TouchableOpacity>
           </View>
@@ -139,12 +150,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     backgroundColor: "#fff",
   },
-  avatar: {
-    marginRight: 12,
-  },
   chatContent: {
     flex: 1,
     justifyContent: "center",
+    marginLeft: 10,
   },
   chatHeader: {
     flexDirection: "row",
@@ -170,15 +179,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  modal: {
-    justifyContent: "flex-end",
-    margin: 0,
-  },
   modalContent: {
     backgroundColor: "white",
     padding: 24,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderRadius: 12,
   },
   modalTitle: {
     fontSize: 20,

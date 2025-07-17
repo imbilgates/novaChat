@@ -79,32 +79,35 @@ const SearchUsers = () => {
     }
   };
 
-  const renderItem = ({ item }) => {
-    const isFriend = userPageData?.some((chat) => chat.id === item.uid);
+const renderItem = ({ item }) => {
+  const isFriend = userPageData?.some((chat) => chat.id === item.uid);
 
-    return (
-      <ListItem containerStyle={styles.listItem}>
-        <Avatar rounded source={{ uri: item.photoURL }} />
-        <ListItem.Content>
-          <ListItem.Title style={styles.username}>
-            {item.displayName}
-          </ListItem.Title>
-        </ListItem.Content>
+  return (
+    <ListItem bottomDivider containerStyle={styles.listItem}>
+      <Avatar rounded size="medium" source={{ uri: item.photoURL }} />
+      <ListItem.Content>
+        <ListItem.Title style={styles.username}>
+          {item.displayName}
+        </ListItem.Title>
+        {/* Optional: Show email or status */}
+        {/* <ListItem.Subtitle>{item.email}</ListItem.Subtitle> */}
+      </ListItem.Content>
+      <TouchableOpacity
+        onPress={() =>
+          isFriend ? handleRemoveUser(item) : handleUserSelect(item)
+        }
+        style={styles.iconButton}
+      >
+        <Ionicons
+          name={isFriend ? "person-remove" : "person-add"}
+          size={22}
+          color={isFriend ? "#E74C3C" : "#2ECC71"}
+        />
+      </TouchableOpacity>
+    </ListItem>
+  );
+};
 
-        <TouchableOpacity
-          onPress={() =>
-            isFriend ? handleRemoveUser(item) : handleUserSelect(item)
-          }
-        >
-          <Ionicons
-            name={isFriend ? "person-remove" : "person-add"}
-            size={24}
-            color={isFriend ? "red" : "black"}
-          />
-        </TouchableOpacity>
-      </ListItem>
-    );
-  };
 
   return (
     <View style={styles.container}>
@@ -153,12 +156,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   listItem: {
-    borderBottomWidth: 0,
+    paddingHorizontal: 16,
     paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#ddd",
+    borderRadius: 12,
+    backgroundColor: "#fdfdfd",
+    marginVertical: 4,
+    marginHorizontal: 6,
+    elevation: 1,
   },
   username: {
-    fontWeight: "bold",
+    fontWeight: "600",
     fontSize: 16,
+  },
+  iconButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
   },
   noResults: {
     textAlign: "center",
@@ -167,3 +181,4 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
 });
+

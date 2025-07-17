@@ -29,7 +29,6 @@ const useFetchGroupChats = () => {
                     ...doc.data(),
                 }));
                 setGroupChats(groups);
-                console.log(groups);
                 setLoading(false);
             },
             (err) => {
