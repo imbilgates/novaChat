@@ -10,7 +10,6 @@ import { Avatar } from "react-native-elements";
 import Modal from "react-native-modal";
 import { useRouter } from "expo-router"; // ✅ router import
 import useFetchGroupChats from "../hooks/useFetchFriendGroup";
-import { convertTimestamp } from "../utils/convertTimestamp";
 
 import SkeletonLoader from "../utils/SkeletonLoader";
 

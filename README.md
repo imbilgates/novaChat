@@ -1,50 +1,45 @@
-# Welcome to your Expo app 👋
+# NovaChat 🚀
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+NovaChat is a real-time chat application built with React Native and Firebase. It allows users to engage in private and group conversations with seamless synchronization, authentication, and a clean mobile UI.
 
-## Get started
+## 📸 Screenshots
 
-1. Install dependencies
+<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
 
-   ```bash
-   npm install
-   ```
+  <img src="./github-ss/img1.jpg" width="200" />
+  <img src="./github-ss/img2.jpg" width="200" />
+  <img src="./github-ss/img3.jpg" width="200" />
+  <img src="./github-ss/img4.jpg" width="200" />
+  <img src="./github-ss/img5.jpg" width="200" />
 
-2. Start the app
+</div>
 
-   ```bash
-    npx expo start
-   ```
+## 📱 Features
 
-In the output, you'll find options to open the app in a
+- 🔐 **User Authentication**
+  - Sign up / Log in with email & password
+  - Secure Firebase Authentication
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- 🧑‍🤝‍🧑 **User Discovery**
+  - Search for other users by name or email
+  - View list of all registered users (if public)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- 💬 **Private One-to-One Chat**
+  - Real-time messaging
+  - Firebase Firestore with onSnapshot listeners
 
-## Get a fresh project
+- 👥 **Group Chats**
+  - Create and join group chats
+  - Real-time sync across all group members
 
-When you're ready, run:
+- 🔄 **Real-Time Updates**
+  - Messages sync instantly using Firebase Firestore
+  - Typing indicators and message status (optional)
 
-```bash
-npm run reset-project
-```
+## 🛠️ Tech Stack
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **Frontend**: React Native (TypeScript + Expo)
+- **Backend**: Firebase
+  - Authentication
+  - Firestore (Database)
+  - Cloud Storage (optional for media)
