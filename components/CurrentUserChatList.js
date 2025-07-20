@@ -14,11 +14,11 @@ import useFetchFriends from "../hooks/useFetchFriends";
 import { router } from "expo-router";
 import Modal from "react-native-modal";
 import SkeletonLoader from "../utils/SkeletonLoader";
+import { convertTimestamp } from "../utils/convertTimestamp";
 
 const UsersChatList = () => {
   const { fireUser: currentUser } = useFireUser();
   const { userPageData: chatList, loading, error } = useFetchFriends();
-
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -77,9 +77,7 @@ const UsersChatList = () => {
         <View style={styles.chatHeader}>
           <Text style={styles.username}>{item.name}</Text>
           <Text style={styles.time}>
-            {item.time?.seconds
-              ? new Date(item.time.seconds * 1000).toLocaleTimeString()
-              : ""}
+            {convertTimestamp(item.time)}
           </Text>
         </View>
         <Text style={styles.lastMessage} numberOfLines={1}>

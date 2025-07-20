@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { auth, db } from "../../config/firebase-config";
 import { getUniqueChatId } from "../../utils/getUniqueChatId";
+
 import {
   arrayUnion,
   arrayRemove,
@@ -24,6 +25,8 @@ import {
 } from "firebase/firestore";
 import uuid from "react-native-uuid";
 
+import useUpdateLastMessage from "../../hooks/useUpdateLastMessage";
+
 const ChatScreen = ({ clickedUser }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
@@ -32,6 +35,8 @@ const ChatScreen = ({ clickedUser }) => {
 
   const scrollViewRef = useRef(null);
   const user = auth.currentUser;
+  const updateLastMessage = useUpdateLastMessage();
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -41,9 +46,12 @@ const ChatScreen = ({ clickedUser }) => {
   }, [messages]);
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    });
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }
+    );
     return () => {
       keyboardDidShowListener.remove();
     };
@@ -52,7 +60,11 @@ const ChatScreen = ({ clickedUser }) => {
   useEffect(() => {
     if (user && clickedUser) {
       setLoading(true);
-      const chatRef = doc(db, "chats", getUniqueChatId(user?.uid, clickedUser?.uid));
+      const chatRef = doc(
+        db,
+        "chats",
+        getUniqueChatId(user?.uid, clickedUser?.uid)
+      );
       const unsubscribe = onSnapshot(chatRef, (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
@@ -92,6 +104,8 @@ const ChatScreen = ({ clickedUser }) => {
         });
       }
 
+      await updateLastMessage(clickedUser?.uid, message);
+
       setMessage("");
     } catch (error) {
       console.error("Error sending message: ", error);
@@ -115,7 +129,10 @@ const ChatScreen = ({ clickedUser }) => {
 
     return (
       <TouchableOpacity
-        onPress={() => isSentByUser && setOpenMessageIndex(prev => (prev === index ? null : index))}
+        onPress={() =>
+          isSentByUser &&
+          setOpenMessageIndex((prev) => (prev === index ? null : index))
+        }
         activeOpacity={0.8}
         style={[
           styles.messageContainer,

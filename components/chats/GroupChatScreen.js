@@ -24,13 +24,17 @@ import {
 } from "firebase/firestore";
 import uuid from "react-native-uuid";
 import { Timestamp } from "firebase/firestore";
-
+import useUpdateGroupLastMessage from "../../hooks/useUpdateGroupLastMessage";
 
 const GroupChatScreen = ({ group }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [openMessageIndex, setOpenMessageIndex] = useState(null);
 
+  console.log(group);
+  
+
+  const { updateLastMessage } = useUpdateGroupLastMessage();
   const flatListRef = useRef(null);
   const user = auth.currentUser;
 
@@ -112,9 +116,11 @@ const GroupChatScreen = ({ group }) => {
         });
       }
 
+      await updateLastMessage(group?.groupId, message);
+
       setMessage("");
     } catch (err) {
-      console.error("Error sending message:", err); // ← ADD THIS
+      console.error("Error sending message:", err);
     }
   };
 

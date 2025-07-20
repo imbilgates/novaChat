@@ -7,6 +7,17 @@ const GroupLayout = () => {
       <Stack.Screen
         name="[id]"
         options={{
+          title: "GROUP",
+          headerStyle: styles.header,
+          headerTitleStyle: styles.headerTitle,
+          headerShadowVisible: false,
+          headerTintColor: '#222',
+        }}
+      />
+      <Stack.Screen
+        name="info"
+        options={{
+          title: "GROUP-INFO",
           headerStyle: styles.header,
           headerTitleStyle: styles.headerTitle,
           headerShadowVisible: false,

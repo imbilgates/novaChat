@@ -12,6 +12,9 @@ import { useRouter } from "expo-router"; // ✅ router import
 import useFetchGroupChats from "../hooks/useFetchFriendGroup";
 
 import SkeletonLoader from "../utils/SkeletonLoader";
+import { db } from "../config/firebase-config";
+import { deleteDoc, doc } from "firebase/firestore";
+import { convertTimestamp } from "../utils/convertTimestamp";
 
 const GroupChatList = () => {
   const router = useRouter(); // ✅ initialize router
@@ -34,14 +37,13 @@ const GroupChatList = () => {
     setSelectedGroup(null);
   };
 
-  const handleRemoveGroup = async () => {
+  const handleRemoveGroup = async (id) => {
+    const chatRef = doc(db, "groupChats", id);
+
     try {
-      if (selectedGroup) {
-        await handleRemoveItem(selectedGroup.id); // ❗Make sure this function exists in your scope
-        closeModal();
-      }
+      await deleteDoc(chatRef);
     } catch (error) {
-      console.error("Error removing group:", error);
+      console.error("Error removing chat:", error);
     }
   };
 
@@ -77,7 +79,9 @@ const GroupChatList = () => {
         <View style={styles.chatContent}>
           <View style={styles.chatHeader}>
             <Text style={styles.username}>{item.name || "Unnamed Group"}</Text>
-            <Text style={styles.time}>{item.time || "N/A"}</Text>
+            <Text style={styles.time}>
+              {convertTimestamp(item?.updatedAt) || "N/A"}
+            </Text>
           </View>
           <Text style={styles.lastMessage} numberOfLines={1}>
             {item.text || "Start the conversation..."}
@@ -122,7 +126,10 @@ const GroupChatList = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.deleteButton}
-              onPress={handleRemoveGroup}
+              onPress={() => {
+                handleRemoveGroup(selectedGroup?.id);
+                closeModal();
+              }}
             >
               <Text style={styles.deleteText}>Delete</Text>
             </TouchableOpacity>
