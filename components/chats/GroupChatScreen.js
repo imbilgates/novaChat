@@ -31,8 +31,6 @@ const GroupChatScreen = ({ group }) => {
   const [message, setMessage] = useState("");
   const [openMessageIndex, setOpenMessageIndex] = useState(null);
 
-  console.log(group);
-  
 
   const { updateLastMessage } = useUpdateGroupLastMessage();
   const flatListRef = useRef(null);
