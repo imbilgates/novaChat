@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../store/authThunks';
+import { login } from '../../src/store/authThunks';
 
 const LoginScreen = () => {
   const router = useRouter();

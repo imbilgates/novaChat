@@ -3,8 +3,8 @@ import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-nati
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-elements';
-import ChatScreen from '../../components/chats/ChatScreen';
-import useUsersLog from '../../hooks/useUsersLog';
+import ChatScreen from '../../src/components/chats/ChatScreen';
+import useUsersLog from '../../src/hooks/useUsersLog';
 
 const screenWidth = Dimensions.get('window').width;
 

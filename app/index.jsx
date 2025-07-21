@@ -1,7 +1,7 @@
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../config/firebase-config';
+import { auth } from '../src/config/firebase-config';
 
 const Index = () => {
   const [checkingAuth, setCheckingAuth] = useState(true);

@@ -8,8 +8,8 @@ import {
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { Avatar } from "react-native-elements";
-import useFetchGroupChats from "../../hooks/useFetchFriendGroup";
-import GroupChatScreen from "../../components/chats/GroupChatScreen";
+import useFetchGroupChats from "../../src/hooks/useFetchFriendGroup";
+import GroupChatScreen from "../../src/components/chats/GroupChatScreen";
 
 const screenWidth = Dimensions.get("window").width;
 

@@ -2,9 +2,9 @@ import { Tabs } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { StyleSheet } from 'react-native';
-import Signout from '../../components/Signout';
-import CreateGroupModal from '../../components/CreateGroupModal';
-import { useFireUser } from '../../context/UserContext';
+import Signout from '../../src/components/Signout';
+import CreateGroupModal from '../../src/components/CreateGroupModal';
+import { useFireUser } from '../../src/context/UserContext';
 
 const _Layout = () => {
   const { openGrp, setOpenGrp } = useFireUser();

@@ -1,11 +1,11 @@
 import { Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
 import 'react-native-reanimated';
-import { UserProvider } from '../context/UserContext';
+import { UserProvider } from '../src/context/UserContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ChatProvider } from '../context/ChatContext';
+import { ChatProvider } from '../src/context/ChatContext';
 
-import { store } from '../store/store'
+import { store } from '../src/store/store'
 import { Provider } from 'react-redux'
 
 

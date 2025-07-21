@@ -2,7 +2,7 @@ import { View, StyleSheet, TextInput, Button, KeyboardAvoidingView, TouchableOpa
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { register } from '../../store/authThunks';
+import { register } from '../../src/store/authThunks';
 
 const Signup = () => {
     const [email, setEmail] = useState('');

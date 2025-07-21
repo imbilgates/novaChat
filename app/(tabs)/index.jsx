@@ -6,10 +6,10 @@ import {
   StatusBar as RNStatusBar,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import CurrentUserChatList from '../../components/CurrentUserChatList';
-import GroupChatList from '../../components/GroupChatList';
+import CurrentUserChatList from '../../src/components/CurrentUserChatList';
+import GroupChatList from '../../src/components/GroupChatList';
 import { useState } from 'react';
-import ChatToggleTabs from '../../components/ChatToggleTabs';
+import ChatToggleTabs from '../../src/components/ChatToggleTabs';
 
 const Index = () => {
   const statusBarHeight = Platform.OS === 'android' ? RNStatusBar.currentHeight ?? 24 : 0;
