@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import Modal from "react-native-modal";
 import SkeletonLoader from "../utils/SkeletonLoader";
 import { convertTimestamp } from "../utils/convertTimestamp";
+import ProfileImageWithPreview from "../components/ProfileImageWithPreview";
 
 const UsersChatList = () => {
   const { fireUser: currentUser } = useFireUser();
@@ -52,18 +53,8 @@ const UsersChatList = () => {
       onLongPress={() => openDeleteModal(item)}
     >
       {item.img ? (
-        <Avatar
-          rounded
-          source={{ uri: item.img }}
-          size="medium"
-          title={item.name?.charAt(0).toUpperCase() || "U"}
-          renderPlaceholderContent={
-            <Text style={{ color: "#fff", fontWeight: "bold" }}>
-              {item.name?.charAt(0).toUpperCase() || "U"}
-            </Text>
-          }
-          containerStyle={{ backgroundColor: "#000" }}
-        />
+        <ProfileImageWithPreview uri={item.img} name={item.name} />
+
       ) : (
         <Avatar
           rounded
