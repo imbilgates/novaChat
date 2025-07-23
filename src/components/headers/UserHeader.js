@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { Avatar } from "react-native-elements";

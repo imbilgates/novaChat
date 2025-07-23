@@ -8,14 +8,14 @@ import {
 } from "react-native";
 import { Avatar } from "react-native-elements";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../config/firebase-config";
-import { useFireUser } from "../context/UserContext";
-import useFetchFriends from "../hooks/useFetchFriends";
+import { db } from "../../config/firebase-config";
+import { useFireUser } from "../../context/UserContext";
+import useFetchFriends from "../../hooks/useFetchFriends";
 import { router } from "expo-router";
 import Modal from "react-native-modal";
-import SkeletonLoader from "./skeletons/SkeletonLoader";
-import { convertTimestamp } from "../utils/convertTimestamp";
-import ProfileImageWithPreview from "../components/ProfileImageWithPreview";
+import SkeletonLoader from "../skeletons/SkeletonLoader";
+import { convertTimestamp } from "../../utils/convertTimestamp";
+import ProfileImageWithPreview from "../profile/ProfileImageWithPreview";
 
 const UsersChatList = () => {
   const { fireUser: currentUser } = useFireUser();

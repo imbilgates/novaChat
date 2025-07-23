@@ -9,12 +9,12 @@ import {
 import { Avatar } from "react-native-elements";
 import Modal from "react-native-modal";
 import { useRouter } from "expo-router"; // ✅ router import
-import useFetchGroupChats from "../hooks/useFetchFriendGroup";
+import useFetchGroupChats from "../../hooks/useFetchFriendGroup";
 
-import SkeletonLoader from "./skeletons/SkeletonLoader";
-import { db } from "../config/firebase-config";
+import SkeletonLoader from "../skeletons/SkeletonLoader";
+import { db } from "../../config/firebase-config";
 import { deleteDoc, doc } from "firebase/firestore";
-import { convertTimestamp } from "../utils/convertTimestamp";
+import { convertTimestamp } from "../../utils/convertTimestamp";
 
 const GroupChatList = () => {
   const router = useRouter(); // ✅ initialize router

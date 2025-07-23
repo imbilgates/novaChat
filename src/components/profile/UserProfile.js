@@ -13,9 +13,9 @@ import * as ImagePicker from "expo-image-picker";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-import { db, storage } from "../config/firebase-config";
+import { db, storage } from "../../config/firebase-config";
 import { useUser } from "@clerk/clerk-expo";
-import { useFireUser } from "../context/UserContext";
+import { useFireUser } from "../../context/UserContext";
 
 export const UserProfile = () => {
   const { user, isLoaded } = useUser(); // Clerk user

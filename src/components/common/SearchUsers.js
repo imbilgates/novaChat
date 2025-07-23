@@ -11,12 +11,12 @@ import {
 import { Avatar, ListItem } from "react-native-elements";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { router, useFocusEffect } from "expo-router";
-import useUsersGetLog from "../hooks/useUsersGetLog";
-import { useFireUser } from "../context/UserContext";
-import { addChatToUserPage } from "../utils/addChatToUserPage";
-import useFetchFriends from "../hooks/useFetchFriends";
+import useUsersGetLog from "../../hooks/useUsersGetLog";
+import { useFireUser } from "../../context/UserContext";
+import { addChatToUserPage } from "./addChatToUserPage";
+import useFetchFriends from "../../hooks/useFetchFriends";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../config/firebase-config";
+import { db } from "../../config/firebase-config";
 
 const SearchUsers = () => {
   const { users } = useUsersGetLog();
@@ -126,7 +126,7 @@ const renderItem = ({ item }) => {
         <FlatList
           style={styles.searchList}
           data={filteredList}
-          keyExtractor={(item) => item.uid}
+          keyExtractor={(_,i) => i}
           renderItem={renderItem}
         />
       )}

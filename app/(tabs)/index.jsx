@@ -6,10 +6,10 @@ import {
   StatusBar as RNStatusBar,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import CurrentUserChatList from '../../src/components/CurrentUserChatList';
-import GroupChatList from '../../src/components/GroupChatList';
+import CurrentUserChatList from '../../src/components/chats/CurrentUserChatList';
+import GroupChatList from '../../src/components/chats/GroupChatList';
 import { useState } from 'react';
-import ChatToggleTabs from '../../src/components/ChatToggleTabs';
+import ChatToggleTabs from '../../src/components/chats/ChatToggleTabs';
 import useSaveUserLog from '../../src/hooks/useSaveUserLog';
 
 

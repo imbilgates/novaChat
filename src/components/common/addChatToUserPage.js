@@ -1,5 +1,5 @@
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
-import { db } from "../config/firebase-config";
+import { db } from "../../config/firebase-config";
 
 export const addChatToUserPage = async (currentUser, selectedUser) => {
   if (!currentUser || !selectedUser) return;
@@ -12,7 +12,7 @@ export const addChatToUserPage = async (currentUser, selectedUser) => {
     name: selectedUser.displayName,
     img: selectedUser.photoURL,
     time: new Date(),
-    text: "Start chatting...",
+    text: "Say hi!",
   };
 
   if (userSnapshot.exists()) {

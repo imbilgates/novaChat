@@ -11,10 +11,10 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import { useFireUser } from "../context/UserContext";
-import useFetchFriends from "../hooks/useFetchFriends";
+import { useFireUser } from "../../context/UserContext";
+import useFetchFriends from "../../hooks/useFetchFriends";
 import { doc, setDoc, Timestamp } from "firebase/firestore";
-import { db } from "../config/firebase-config";
+import { db } from "../../config/firebase-config";
 import { CheckBox } from "react-native-elements";
 
 const CreateGroupModal = () => {

@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native'
-import SearchUsers from '../../src/components/SearchUsers'
+import SearchUsers from '../../src/components/common/SearchUsers'
 
 const Search = () => {
   return (

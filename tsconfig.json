@@ -6,5 +6,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/chat/info/_layout.jsx", "app/chat/info/[chatId].jsx"  ]
+, "app/chat/info/_layout.jsx", "app/chat/info/[chatId].jsx", "app/group/info/[groupId].jsx", "app/group/info/_layout.jsx"  ]
 }
