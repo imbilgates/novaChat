@@ -1,29 +1,40 @@
-import { StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
+import { StyleSheet } from 'react-native';
 
-const Layout = () => {
+const GroupLayout = () => {
   return (
     <Stack>
       <Stack.Screen
         name="[id]"
         options={{
+          title: "CHAT",
           headerStyle: styles.header,
           headerTitleStyle: styles.headerTitle,
-          headerShadowVisible: false, // removes bottom border
-          headerTintColor: '#222',    // color for back icon
+          headerShadowVisible: false,
+          headerTintColor: '#222',
+        }}
+      />
+      <Stack.Screen
+        name="info"
+        options={{
+          title: "USER-INFO",
+          headerStyle: styles.header,
+          headerTitleStyle: styles.headerTitle,
+          headerShadowVisible: false,
+          headerTintColor: '#222',
         }}
       />
     </Stack>
   );
 };
 
-export default Layout;
+export default GroupLayout;
 
 const styles = StyleSheet.create({
   header: {
     backgroundColor: '#f9f9f9',
-    elevation: 0, // for Android
-    shadowOpacity: 0, // for iOS
+    elevation: 0,
+    shadowOpacity: 0,
   },
   headerTitle: {
     fontSize: 18,

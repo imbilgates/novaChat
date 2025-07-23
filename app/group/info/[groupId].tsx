@@ -4,14 +4,13 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import useFetchGroupChats from "../../../src/hooks/useFetchFriendGroup";
 import useUsersGetLog from "../../../src/hooks/useUsersGetLog";
 import { Avatar } from "react-native-elements";
 import { convertTimestamp } from "../../../src/utils/convertTimestamp";
-import  GroupInfoSkeleton from "../../../src/utils/GroupInfoSkeleton";
+import SkeletonList from "../../../src/components/skeletons/SkeletonList";
 
 const GroupInfoScreen = () => {
   const { groupId } = useLocalSearchParams();
@@ -26,7 +25,7 @@ const GroupInfoScreen = () => {
 
   if (isLoading) {
     return (
-       <GroupInfoSkeleton />
+       <SkeletonList variant={"group"} />
     );
   }
 

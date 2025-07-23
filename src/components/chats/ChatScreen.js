@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { auth, db } from "../../config/firebase-config";
+import { db } from "../../config/firebase-config";
 import { getUniqueChatId } from "../../utils/getUniqueChatId";
 
 import {
@@ -26,6 +26,7 @@ import {
 import uuid from "react-native-uuid";
 
 import useUpdateLastMessage from "../../hooks/useUpdateLastMessage";
+import { useUser } from "@clerk/clerk-expo";
 
 const ChatScreen = ({ clickedUser }) => {
   const [messages, setMessages] = useState([]);
@@ -33,10 +34,11 @@ const ChatScreen = ({ clickedUser }) => {
   const [loading, setLoading] = useState(true);
   const [openMessageIndex, setOpenMessageIndex] = useState(null);
 
-  const scrollViewRef = useRef(null);
-  const user = auth.currentUser;
-  const updateLastMessage = useUpdateLastMessage();
+  const { user } = useUser()
+  
 
+  const scrollViewRef = useRef(null);
+  const updateLastMessage = useUpdateLastMessage();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -56,6 +58,7 @@ const ChatScreen = ({ clickedUser }) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+  
 
   useEffect(() => {
     if (user && clickedUser) {
@@ -63,7 +66,7 @@ const ChatScreen = ({ clickedUser }) => {
       const chatRef = doc(
         db,
         "chats",
-        getUniqueChatId(user?.uid, clickedUser?.uid)
+        getUniqueChatId(user?.id, clickedUser?.uid)
       );
       const unsubscribe = onSnapshot(chatRef, (snapshot) => {
         if (snapshot.exists()) {
@@ -83,14 +86,14 @@ const ChatScreen = ({ clickedUser }) => {
     try {
       const receivedMessage = {
         id: uuid.v4(),
-        name: user?.displayName || "Anonymous",
-        img: user?.photoURL,
+        name: user?.firstName || "Anonymous",
+        img: user?.imageUrl || "",
         time: new Date().toLocaleTimeString(),
         text: message,
-        sender: user?.uid,
+        sender: user?.id,
       };
 
-      const chatId = getUniqueChatId(user?.uid, clickedUser?.uid);
+      const chatId = getUniqueChatId(user?.id, clickedUser?.uid);
       const chatRef = doc(db, "chats", chatId);
       const chatDoc = await getDoc(chatRef);
 
@@ -114,7 +117,7 @@ const ChatScreen = ({ clickedUser }) => {
 
   const deleteChatMessage = async (msg) => {
     try {
-      const chatId = getUniqueChatId(user?.uid, clickedUser?.uid);
+      const chatId = getUniqueChatId(user?.id, clickedUser?.uid);
       const chatRef = doc(db, "chats", chatId);
       await updateDoc(chatRef, {
         messages: arrayRemove(msg),
@@ -125,7 +128,7 @@ const ChatScreen = ({ clickedUser }) => {
   };
 
   const renderItem = ({ item, index }) => {
-    const isSentByUser = item.sender === user?.uid;
+    const isSentByUser = item.sender === user?.id;
 
     return (
       <TouchableOpacity

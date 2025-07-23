@@ -5,22 +5,21 @@ import { UserProvider } from '../src/context/UserContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ChatProvider } from '../src/context/ChatContext';
 
-import { store } from '../src/store/store'
-import { Provider } from 'react-redux'
-
+import { ClerkProvider } from '@clerk/clerk-expo'
+import { tokenCache } from '@clerk/clerk-expo/token-cache'
 
 
 export default function RootLayout() {
   return (
-    <Provider store={store}>
-      <UserProvider>
-        <ChatProvider>
-          <GestureHandlerRootView style={styles.container}>
-                <LayoutWithRedirect />
-          </GestureHandlerRootView>
-        </ChatProvider>
-      </UserProvider>
-    </Provider>
+    <ClerkProvider tokenCache={tokenCache}>
+        <UserProvider>
+          <ChatProvider>
+            <GestureHandlerRootView style={styles.container}>
+              <LayoutWithRedirect />
+            </GestureHandlerRootView>
+          </ChatProvider>
+        </UserProvider>
+    </ClerkProvider>
   );
 }
 

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { auth, db } from "../../config/firebase-config";
+import { db } from "../../config/firebase-config";
 import {
   arrayUnion,
   arrayRemove,
@@ -21,20 +21,27 @@ import {
   onSnapshot,
   setDoc,
   updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 import uuid from "react-native-uuid";
-import { Timestamp } from "firebase/firestore";
+import { useUser } from "@clerk/clerk-expo";
 import useUpdateGroupLastMessage from "../../hooks/useUpdateGroupLastMessage";
 
 const GroupChatScreen = ({ group }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [openMessageIndex, setOpenMessageIndex] = useState(null);
-
-
-  const { updateLastMessage } = useUpdateGroupLastMessage();
   const flatListRef = useRef(null);
-  const user = auth.currentUser;
+
+  const { user } = useUser();
+  const { updateLastMessage } = useUpdateGroupLastMessage();
+
+  const mappedUser = {
+    uid: user?.id,
+    displayName: user?.fullName || "",
+    email: user?.primaryEmailAddress?.emailAddress || "",
+    photoURL: user?.imageUrl || "",
+  };
 
   const getUniqueChatId = (user, chatWithWho) => {
     if (Array.isArray(chatWithWho.members)) {
@@ -46,8 +53,8 @@ const GroupChatScreen = ({ group }) => {
   };
 
   useEffect(() => {
-    if (user && group) {
-      const chatId = getUniqueChatId(user, group);
+    if (mappedUser.uid && group) {
+      const chatId = getUniqueChatId(mappedUser, group);
       const chatRef = doc(db, "chats", chatId);
 
       const unsubscribe = onSnapshot(chatRef, (snapshot) => {
@@ -67,7 +74,7 @@ const GroupChatScreen = ({ group }) => {
 
       return () => unsubscribe();
     }
-  }, [user, group]);
+  }, [mappedUser, group]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -93,14 +100,14 @@ const GroupChatScreen = ({ group }) => {
     try {
       const newMessage = {
         id: uuid.v4(),
-        name: user?.displayName || "Anonymous",
-        img: user?.photoURL,
+        name: mappedUser.displayName || "Anonymous",
+        img: mappedUser.photoURL,
         time: Timestamp.now(),
         text: message,
-        sender: user?.uid,
+        sender: mappedUser.uid,
       };
 
-      const chatId = getUniqueChatId(user, group);
+      const chatId = getUniqueChatId(mappedUser, group);
       const chatRef = doc(db, "chats", chatId);
       const chatDoc = await getDoc(chatRef);
 
@@ -115,7 +122,6 @@ const GroupChatScreen = ({ group }) => {
       }
 
       await updateLastMessage(group?.groupId, message);
-
       setMessage("");
     } catch (err) {
       console.error("Error sending message:", err);
@@ -124,7 +130,7 @@ const GroupChatScreen = ({ group }) => {
 
   const deleteChatMessage = async (msg) => {
     try {
-      const chatId = getUniqueChatId(user, group); // ✅ this is important!
+      const chatId = getUniqueChatId(mappedUser, group);
       const chatRef = doc(db, "chats", chatId);
       await updateDoc(chatRef, {
         messages: arrayRemove(msg),
@@ -135,7 +141,7 @@ const GroupChatScreen = ({ group }) => {
   };
 
   const renderItem = ({ item, index }) => {
-    const isSentByUser = item.sender === user?.uid;
+    const isSentByUser = item.sender === mappedUser.uid;
     const timeText = item.time?.seconds
       ? new Date(item.time.seconds * 1000).toLocaleTimeString()
       : "";
@@ -195,12 +201,12 @@ const GroupChatScreen = ({ group }) => {
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 80}
     >
       <FlatList
-        data={messages.slice().reverse()} // reverse data to show latest at top
+        data={messages.slice().reverse()}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         ref={flatListRef}
         contentContainerStyle={styles.scrollView}
-        inverted // 👈 this flips the scroll direction
+        inverted
       />
 
       <View style={styles.inputContainer}>
@@ -225,6 +231,7 @@ const GroupChatScreen = ({ group }) => {
 };
 
 export default GroupChatScreen;
+
 
 const styles = StyleSheet.create({
   scrollView: {

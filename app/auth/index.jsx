@@ -1,160 +1,91 @@
-import { View, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, Text, TouchableOpacity, Image } from 'react-native';
-import React, { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import { useSocialAuth } from '../../src/hooks/useSocialAuth';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../src/store/authThunks';
-
-const LoginScreen = () => {
-  const router = useRouter();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const dispatch = useDispatch();
-  const authStatus = useSelector((state) => state.auth.status);
-  const authError = useSelector((state) => state.auth.error);
-
-  const handleLogin = async () => {
-    setLoading(true);
-    try {
-      await dispatch(login({ email, password })).unwrap();
-      // Optional: navigate or toast
-      router.replace("/(tabs)")
-    } catch (err) {
-      console.error('Login failed:', err);
-      // Show user-friendly error message
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const WelcomeScreen = () => {
+  const { handleSocialAuth, isLoading } = useSocialAuth();
 
   return (
     <View style={styles.container}>
-      <KeyboardAvoidingView behavior="padding" style={styles.avoidingView}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#aaa"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          onChangeText={setEmail}
-          value={email}
+      <Image
+        source={require('../../assets/images/image.png')}
+        style={styles.bannerImage}
+        resizeMode="contain"
+      />
+
+      <Text style={styles.title}>NovaChat</Text>
+      <Text style={styles.subtitle}>
+        Welcome to the future{'\n'}of private conversations
+      </Text>
+
+      <TouchableOpacity
+        style={styles.googleBtn}
+        onPress={() => handleSocialAuth('oauth_google')}
+        disabled={isLoading}
+      >
+        <Image
+          source={require('../../assets/images/google.png')}
+          style={styles.googleIcon}
         />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#aaa"
-          autoCapitalize="none"
-          onChangeText={setPassword}
-          value={password}
-          secureTextEntry
-        />
-
-        <View style={styles.linkContainer}>
-          <Text style={styles.text}>Don't have an account?</Text>
-          <TouchableOpacity onPress={() => router.replace('auth/signup')}>
-            <Text style={styles.link}>Signup</Text>
-          </TouchableOpacity>
-        </View>
-
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : (
-          <View style={{ marginTop: 20 }}>
-            <Button title="Login" onPress={handleLogin} />
-            {authStatus === 'loading' && <Text>Loading...</Text>}
-            {authError && <Text>Error: {authError}</Text>}
-          </View>
-        )}
-
-        {/* Optional Google UI (without Clerk logic) */}
-        <View style={styles.googleBtnContainer}>
-          <Text>Or Continue with</Text>
-          <TouchableOpacity style={styles.googleBtn} onPress={() => alert("Google login not implemented")}>
-            <Image
-              source={require('../../assets/images/google.png')}
-              style={styles.googleIcon}
-            />
-            <Text style={styles.googleBtnText}>Signin with Google</Text>
-          </TouchableOpacity>
-        </View>
-
-      </KeyboardAvoidingView>
+        <Text style={styles.googleBtnText}>
+          {isLoading ? 'Signing in...' : 'Continue with Google'}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
-export default LoginScreen;
-
+export default WelcomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 20,
     flex: 1,
-    justifyContent: 'center',
-  },
-  avoidingView: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  input: {
-    marginVertical: 4,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 50,
-    paddingLeft: 20,
-    backgroundColor: '#fff',
-  },
-  linkContainer: {
-    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 30,
+    backgroundColor: '#F3F4F6', // light gray
+    paddingHorizontal: 20,
   },
-  text: {
-    textAlign: 'center',
+  bannerImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 30,
   },
-  link: {
-    color: '#0066cc',
+  title: {
+    fontSize: 36,
     fontWeight: 'bold',
-    marginLeft: 5,
+    color: '#111827', // dark text
+    marginBottom: 8,
   },
-  googleBtnContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
+  subtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 40,
+    lineHeight: 24,
   },
   googleBtn: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 4,
-    backgroundColor: '#ffffff',
-    borderColor: '#dcdcdc',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 30,
+    borderColor: '#D1D5DB',
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-    marginTop: 10,
-  },
-  googleBtnText: {
-    color: '#555555',
-    fontSize: 16,
-    fontWeight: '500',
+    shadowRadius: 6,
+    elevation: 5,
   },
   googleIcon: {
     width: 24,
     height: 24,
-    marginRight: 10,
-    borderRadius: 100,
+    marginRight: 12,
+    borderRadius: 10
   },
-
+  googleBtnText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#374151',
+  },
 });

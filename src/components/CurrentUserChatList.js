@@ -13,7 +13,7 @@ import { useFireUser } from "../context/UserContext";
 import useFetchFriends from "../hooks/useFetchFriends";
 import { router } from "expo-router";
 import Modal from "react-native-modal";
-import SkeletonLoader from "../utils/SkeletonLoader";
+import SkeletonLoader from "./skeletons/SkeletonLoader";
 import { convertTimestamp } from "../utils/convertTimestamp";
 import ProfileImageWithPreview from "../components/ProfileImageWithPreview";
 

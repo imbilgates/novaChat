@@ -1,24 +1,12 @@
 import { Redirect } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../src/config/firebase-config';
+import { useAuth } from '@clerk/clerk-expo';
 
 const Index = () => {
-  const [checkingAuth, setCheckingAuth] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isLoaded, isSignedIn } = useAuth();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user);
-      setCheckingAuth(false);
-    });
+  if (!isLoaded) return null;
 
-    return unsubscribe;
-  }, []);
-
-  if (checkingAuth) return null; // or loading spinner
-
-  return <Redirect href={isAuthenticated ? '/(tabs)' : '/auth'} />;
+  return <Redirect href={isSignedIn ? '/(tabs)' : '/auth'} />;
 };
 
 export default Index;

@@ -4,7 +4,7 @@ const GroupLayout = () => {
   return (
     <Stack>
       <Stack.Screen
-        name="[groupId]"
+        name="[chatId]"
         options={{
           headerShown: false,
         }}

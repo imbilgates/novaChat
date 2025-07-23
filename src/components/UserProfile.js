@@ -10,18 +10,19 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+import { db, storage } from "../config/firebase-config";
+import { useUser } from "@clerk/clerk-expo";
 import { useFireUser } from "../context/UserContext";
-import { auth, db, storage } from "../config/firebase-config";
 
 export const UserProfile = () => {
-  const { fireUser: user } = useFireUser();
+  const { user, isLoaded } = useUser(); // Clerk user
+  const { fireUser } = useFireUser(); // Your mapped format from context
 
-  const [displayName, setDisplayName] = useState(user?.displayName || "");
-  const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
+  const [displayName, setDisplayName] = useState(fireUser?.displayName || "");
+  const [photoURL, setPhotoURL] = useState(fireUser?.photoURL || "");
   const [uploading, setUploading] = useState(false);
 
   const handlePickImage = async () => {
@@ -46,7 +47,7 @@ export const UserProfile = () => {
         const response = await fetch(imageUri);
         const blob = await response.blob();
 
-        const imageRef = ref(storage, `profile_images/${user.uid}`);
+        const imageRef = ref(storage, `profile_images/${fireUser.uid}`);
         await uploadBytes(imageRef, blob);
         const downloadURL = await getDownloadURL(imageRef);
 
@@ -61,38 +62,38 @@ export const UserProfile = () => {
   };
 
   const handleUpdateProfile = async () => {
-    if (!auth.currentUser) return;
+    if (!user || !fireUser?.uid) {
+      return Alert.alert("Error", "User is not loaded.");
+    }
 
     try {
       setUploading(true);
 
-      await updateProfile(auth.currentUser, {
-        displayName: displayName.trim(),
+      const trimmedName = displayName.trim();
+      const userData = {
+        displayName: trimmedName,
         photoURL,
+        uid: fireUser.uid,
+        email: fireUser.email,
+        lastLogin: new Date().toISOString(),
+      };
+
+      // 🔹 1. Update Firestore
+      await setDoc(doc(db, "users-log", fireUser.uid), userData, {
+        merge: true,
       });
 
-      await setDoc(
-        doc(db, "users-log", user.uid),
-        {
-          displayName: displayName.trim(),
-          photoURL,
-          uid: user.uid,
-          email: user.email,
-          lastLogin: new Date().toISOString(),
-        },
-        { merge: true }
-      );
 
       Alert.alert("Success", "Profile updated.");
     } catch (err) {
-      Alert.alert("Error", "Failed to update profile.");
       console.error("Update Error:", err);
+      Alert.alert("Error", "Failed to update profile.");
     } finally {
       setUploading(false);
     }
   };
 
-  if (!user) {
+  if (!isLoaded || !fireUser) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#3B82F6" />
@@ -110,7 +111,7 @@ export const UserProfile = () => {
         <Text style={styles.editIcon}>✏️</Text>
       </TouchableOpacity>
 
-      <Text>{user?.email}</Text>
+      <Text>{fireUser?.email}</Text>
       <TextInput
         style={styles.input}
         placeholder="Full Name"

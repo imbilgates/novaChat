@@ -10,8 +10,11 @@ import CurrentUserChatList from '../../src/components/CurrentUserChatList';
 import GroupChatList from '../../src/components/GroupChatList';
 import { useState } from 'react';
 import ChatToggleTabs from '../../src/components/ChatToggleTabs';
+import useSaveUserLog from '../../src/hooks/useSaveUserLog';
+
 
 const Index = () => {
+  useSaveUserLog()
   const statusBarHeight = Platform.OS === 'android' ? RNStatusBar.currentHeight ?? 24 : 0;
   const [activeTab, setActiveTab] = useState('chats');
 
