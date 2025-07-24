@@ -38,14 +38,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start', // Align to the left
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#f0f0f0', // Keep original
+    backgroundColor: '#ffffffff', // Keep original
   },
   toggleButton: {
     paddingVertical: 8,
     paddingHorizontal: 20,
     marginRight: 10,
     borderRadius: 30,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: '#e1e3e5ff',
     elevation: 2, // subtle shadow
   },
   toggleText: {

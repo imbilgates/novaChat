@@ -41,6 +41,7 @@
     "firebase": "^10.14.1",
     "node": "^22.7.0",
     "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-native": "0.79.5",
     "react-native-dotenv": "^3.4.11",
     "react-native-elements": "^3.4.3",

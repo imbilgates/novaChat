@@ -1,13 +1,22 @@
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../../config/firebase-config";
 
+// Add each user to the other's userPage chat list
 export const addChatToUserPage = async (currentUser, selectedUser) => {
   if (!currentUser || !selectedUser) return;
 
-  const userRef = doc(db, "userPage", currentUser.uid);
-  const userSnapshot = await getDoc(userRef);
+  const selectedUserRef = doc(db, "userPage", selectedUser.uid);
+  const currentUserRef = doc(db, "userPage", currentUser.uid);
 
-  const chatData = {
+  const chatForSelectedUser = {
+    id: currentUser.uid,
+    name: currentUser.displayName,
+    img: currentUser.photoURL,
+    time: new Date(),
+    text: "Say hi!",
+  };
+
+  const chatForCurrentUser = {
     id: selectedUser.uid,
     name: selectedUser.displayName,
     img: selectedUser.photoURL,
@@ -15,19 +24,37 @@ export const addChatToUserPage = async (currentUser, selectedUser) => {
     text: "Say hi!",
   };
 
-  if (userSnapshot.exists()) {
-    const data = userSnapshot.data();
+  // ---- Update selectedUser's userPage
+  const selectedSnapshot = await getDoc(selectedUserRef);
+  if (selectedSnapshot.exists()) {
+    const data = selectedSnapshot.data();
     const chats = data.chats || [];
-
-    const alreadyExists = chats.some((chat) => chat.id === selectedUser.uid);
-    if (alreadyExists) return; // Don't add again
-
-    await updateDoc(userRef, {
-      chats: arrayUnion(chatData),
-    });
+    const exists = chats.some((chat) => chat.id === currentUser.uid);
+    if (!exists) {
+      await updateDoc(selectedUserRef, {
+        chats: arrayUnion(chatForSelectedUser),
+      });
+    }
   } else {
-    await setDoc(userRef, {
-      chats: [chatData],
+    await setDoc(selectedUserRef, {
+      chats: [chatForSelectedUser],
+    });
+  }
+
+  // ---- Update currentUser's userPage
+  const currentSnapshot = await getDoc(currentUserRef);
+  if (currentSnapshot.exists()) {
+    const data = currentSnapshot.data();
+    const chats = data.chats || [];
+    const exists = chats.some((chat) => chat.id === selectedUser.uid);
+    if (!exists) {
+      await updateDoc(currentUserRef, {
+        chats: arrayUnion(chatForCurrentUser),
+      });
+    }
+  } else {
+    await setDoc(currentUserRef, {
+      chats: [chatForCurrentUser],
     });
   }
 };
